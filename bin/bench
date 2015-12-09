@@ -1,0 +1,28 @@
+#!/bin/bash
+set -euo pipefail
+IFS=$'\n\t'
+
+readonly threads=2
+readonly base="http://localhost:8080"
+
+measure_hardcoded() {
+  measure "/hardcoded"
+}
+
+measure_json_api() {
+  measure "/json_api"
+}
+
+measure() {
+  local endpoint=$1
+
+  echo "Measuring $endpoint"
+  wrk -t $threads $base$endpoint/
+}
+
+main() {
+  measure_hardcoded
+  measure_json_api
+}
+
+main

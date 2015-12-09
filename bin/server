@@ -1,0 +1,19 @@
+#!/bin/bash
+set -euo pipefail
+IFS=$'\n\t'
+
+start_redis() {
+  # redis-cli SHUTDOWN
+  redis-server conf/redis.conf
+}
+
+start_h2o() {
+  dist/bin/h2o --conf conf/h2o.conf
+}
+
+main() {
+  start_redis
+  start_h2o
+}
+
+main

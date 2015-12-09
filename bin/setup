@@ -1,0 +1,70 @@
+#!/bin/bash
+set -euo pipefail
+IFS=$'\n\t'
+
+readonly version="1.6.0"
+readonly root=$(pwd)
+readonly src="src"
+readonly dist="dist"
+declare -a dependencies=("Asmod4n/mruby-hiredis")
+
+create_tmp() {
+  mkdir -p tmp
+}
+
+download() {
+  local filename="v$version.tar.gz"
+
+  if [ ! -f $filename ]; then
+    wget https://github.com/h2o/h2o/archive/$filename
+  fi
+
+  if [ -d $src ]; then
+    rm -rf $src
+  fi
+
+  tar -zxf $filename
+  mv h2o-$version $src
+}
+
+add_dependencies() {
+  for dep in "${dependencies[@]}"
+  do
+    local destination=$src/deps/$(basename $dep)
+
+    if [ ! -d $destination ]; then
+      git clone https://github.com/$dep.git $destination
+    fi
+  done
+}
+
+compile() {
+  pushd $src
+
+  cmake -DCMAKE_C_FLAGS_RELEASE= \
+    -DCMAKE_CXX_FLAGS_RELEASE= \
+    -DCMAKE_INSTALL_PREFIX=$root/$dist \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_FIND_FRAMEWORK=LAST \
+    -DCMAKE_VERBOSE_MAKEFILE=ON \
+    -Wno-dev
+
+  make
+  popd
+}
+
+install() {
+  pushd $src
+  make install
+  popd
+}
+
+main() {
+  create_tmp
+  download
+  add_dependencies
+  compile
+  install
+}
+
+main
