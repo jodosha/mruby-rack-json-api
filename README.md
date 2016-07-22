@@ -17,7 +17,7 @@ For a full explanation of how this works, please read this article: [25,000+ Req
 
 ```shell
 ➜ git clone https://github.com/jodosha/mruby-rack-json-api.git
-➜ cd mruby-json-api
+➜ cd mruby-rack-json-api
 ➜ bin/setup
 ```
 
